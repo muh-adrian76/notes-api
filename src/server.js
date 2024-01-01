@@ -1,39 +1,28 @@
-const Hapi = require("@hapi/hapi");
-const routes = require("./routes");
+const Hapi = require('@hapi/hapi')
+const notes = require('./api/notes')
+const NotesService = require('./services/inMemory/NotesService')
 
 const init = async () => {
+  const notesService = new NotesService()
   const server = Hapi.server({
     port: 5000,
-    host: process.env.NODE_ENV !== "production" ? "localhost" : "0.0.0.0",
+    host: process.env.NODE_ENV !== 'production' ? 'localhost' : '0.0.0.0',
     routes: {
       cors: {
-        origin: ["*"],
-      },
-    },
-  });
+        origin: ['*']
+      }
+    }
+  })
 
-  // routing
-  // server.route([
-  //   {
-  //     method: "GET",
-  //     path: "/",
-  //     handler: (request, h) => {
-  //       return "Halaman utama!";
-  //     },
-  //   },
-  //   {
-  //     method: "GET",
-  //     path: "/about",
-  //     handler: (request, h) => {
-  //       return "Halaman about!";
-  //     },
-  //   },
-  // ]);
+  await server.register({
+    plugin: notes,
+    options: {
+      service: notesService
+    }
+  })
 
-  server.route(routes); // menggunakan modularisasi
+  await server.start()
+  console.log(`Server telah running pada ${server.info.uri}`)
+}
 
-  await server.start();
-  console.log(`Server berjalan pada ${server.info.uri}`);
-};
-
-init();
+init()
