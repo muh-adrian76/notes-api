@@ -29,31 +29,31 @@ const routes = (handler) => [
   {
     method: 'POST',
     path: '/notes', // objek username menjadi opsional
-    handler: handler.postNoteHandler,
+    handler: (request, h) => handler.postNoteHandler(request, h),
     options: { auth: 'notesapp_jwt' },
   },
   {
     method: 'GET',
     path: '/notes',
-    handler: handler.getNotesHandler,
+    handler: (request, h) => handler.getNotesHandler(request, h),
     options: { auth: 'notesapp_jwt' },
   },
   {
     method: 'GET',
     path: '/notes/{id}',
-    handler: handler.getNoteByIdHandler,
+    handler: (request, h) => handler.getNoteByIdHandler(request, h),
     options: { auth: 'notesapp_jwt' },
   },
   {
     method: 'PUT',
     path: '/notes/{id}',
-    handler: handler.putNoteByIdHandler,
+    handler: (request, h) => handler.putNoteByIdHandler(request, h),
     options: { auth: 'notesapp_jwt' },
   },
   {
     method: 'DELETE',
     path: '/notes/{id}',
-    handler: handler.deleteNoteByIdHandler,
+    handler: (request, h) => handler.deleteNoteByIdHandler(request, h),
     options: { auth: 'notesapp_jwt' },
   },
 ];
