@@ -38,7 +38,7 @@ class NotesHandler {
 
     // authorization
     const { id: credentialId } = request.auth.credentials;
-    await this._service.verifyNoteOwner(id, credentialId);
+    await this._service.verifyNoteAccess(id, credentialId);
 
     // masukkan ke var baru menggunakan NotesService
     const note = await this._service.getNoteById(id);
@@ -54,7 +54,7 @@ class NotesHandler {
 
     // authorization
     const { id: credentialId } = request.auth.credentials;
-    await this._service.verifyNoteOwner(id, credentialId);
+    await this._service.verifyNoteAccess(id, credentialId);
 
     await this._service.editNoteById(id, request.payload);
     return h.response({
