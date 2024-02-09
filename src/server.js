@@ -16,7 +16,7 @@ const UsersValidator = require('./validator/users');
 
 // authentications
 const auths = require('./api/auths');
-const AuthsService = require('./services/postgres/AuthService');
+const AuthsService = require('./services/postgres/AuthsService');
 const AuthsValidator = require('./validator/auth');
 const TokenManager = require('./tokenize/TokenManager');
 
