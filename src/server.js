@@ -1,7 +1,10 @@
+/* eslint-disable import/no-extraneous-dependencies */
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
+const Inert = require('@hapi/inert');
 const Jwt = require('@hapi/jwt');
+const path = require('path');
 const ClientError = require('./exceptions/ClientError');
 
 // notes
@@ -30,7 +33,18 @@ const _exports = require('./api/exports');
 const ProducerService = require('./services/rabbitmq/ProducerService');
 const ExportsValidator = require('./validator/exports');
 
+// uploads
+const uploads = require('./api/uploads');
+const StorageService = require('./services/storage/StorageService');
+const UploadsValidator = require('./validator/uploads');
+
 const init = async () => {
+  const collabsService = new CollabsService();
+  const notesService = new NotesService(collabsService);
+  const usersService = new UsersService();
+  const authsService = new AuthsService();
+  const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/files/images'));
+
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
@@ -45,6 +59,9 @@ const init = async () => {
   await server.register([
     {
       plugin: Jwt,
+    },
+    {
+      plugin: Inert,
     },
   ]);
 
@@ -62,11 +79,6 @@ const init = async () => {
       credentials: { id: artifacts.decoded.payload.id },
     }),
   });
-
-  const collabsService = new CollabsService();
-  const notesService = new NotesService(collabsService);
-  const usersService = new UsersService();
-  const authsService = new AuthsService();
 
   await server.register([
     {
@@ -105,6 +117,13 @@ const init = async () => {
       options: {
         service: ProducerService,
         validator: ExportsValidator,
+      },
+    },
+    {
+      plugin: uploads,
+      options: {
+        service: storageService,
+        validator: UploadsValidator,
       },
     },
   ]);
