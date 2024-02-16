@@ -38,9 +38,13 @@ const uploads = require('./api/uploads');
 const StorageService = require('./services/storage/StorageService');
 const UploadsValidator = require('./validator/uploads');
 
+// cache
+const CacheService = require('./services/redis/CacheService');
+
 const init = async () => {
-  const collabsService = new CollabsService();
-  const notesService = new NotesService(collabsService);
+  const cacheService = new CacheService();
+  const collabsService = new CollabsService(cacheService);
+  const notesService = new NotesService(collabsService, cacheService);
   const usersService = new UsersService();
   const authsService = new AuthsService();
   const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/files/images'));
@@ -136,12 +140,10 @@ const init = async () => {
       console.log(response);
       // penanganan client error secara internal.
       if (response instanceof ClientError) {
-        const newResponse = h.response({
+        return h.response({
           status: 'fail',
           message: response.message,
-        });
-        newResponse.code(response.statusCode);
-        return newResponse;
+        }).code(response.statusCode);
       }
 
       // mempertahankan penanganan client error oleh hapi secara native, seperti 404, etc.
@@ -150,12 +152,10 @@ const init = async () => {
       }
 
       // penanganan server error sesuai kebutuhan
-      const newResponse = h.response({
+      return h.response({
         status: 'error',
         message: 'terjadi kegagalan pada server kami',
-      });
-      newResponse.code(500);
-      return newResponse;
+      }).code(500);
     }
 
     // jika bukan error, lanjutkan dengan response sebelumnya (tanpa terintervensi)
